@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import Message from './Message';
+import { sendMessageToAI } from '../services/aiService';
 import './ChatBox.css';
 
 function ChatBox() {
@@ -42,20 +43,13 @@ function ChatBox() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message }),
-      });
-
-      const data = await response.json();
+      // Call AI service directly
+      const aiResponse = await sendMessageToAI(message);
       
       // Add AI response
       const aiMessage = {
         id: Date.now() + 1,
-        text: data.reply,
+        text: aiResponse,
         type: 'ai',
         timestamp: new Date()
       };
@@ -66,7 +60,7 @@ function ChatBox() {
       
       const errorMessage = {
         id: Date.now() + 1,
-        text: "Sorry, I couldn't process your request. Please make sure the server is running and try again.",
+        text: error.message || "Sorry, I couldn't process your request. Please check your API key and try again.",
         type: 'ai',
         timestamp: new Date()
       };
